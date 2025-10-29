@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 /// Receives collision hits on the head and computes damage using punch state flag.
 /// Only processes damage if the fist is in an active punch state.
@@ -16,6 +17,14 @@ public class HitReceiver : MonoBehaviour
     [Header("FX Prefabs (optional)")]
     [SerializeField] private ParticleSystem bloodFxPrefab;
     [SerializeField] private GameObject decalPrefab;        // URP Decal Projector prefab
+
+    [Header("Decal Settings")]
+    [Tooltip("If assigned, each decal instance will use a fresh clone of this base material.")]
+    [SerializeField] private Material decalBaseMaterial;     // Base material to clone per instance
+    [Tooltip("Textures to randomly assign to the decal's Base Map per critical hit.")]
+    [SerializeField] private Texture2D[] decalTextures;
+    [Tooltip("Randomly rotate decal around contact normal for variation.")]
+    [SerializeField] private bool randomizeRotation = true;
 
     private Rigidbody rb;
 
@@ -61,11 +70,51 @@ public class HitReceiver : MonoBehaviour
         // Register combo hit
         comboTracker?.RegisterHit();
 
-        // Spawn FX at contact point
+        // Spawn blood particles at contact point (optional)
         if (bloodFxPrefab != null)
             Instantiate(bloodFxPrefab, bestContact.point, Quaternion.LookRotation(bestContact.normal));
-        if (decalPrefab != null)
-            Instantiate(decalPrefab, bestContact.point, Quaternion.LookRotation(bestContact.normal));
+
+        // Only spawn decal on critical hits
+        bool isCritical = punchSpeed > critSpeed;
+        if (isCritical && decalPrefab != null)
+        {
+            Quaternion rot = Quaternion.LookRotation(bestContact.normal);
+            if (randomizeRotation)
+            {
+                rot *= Quaternion.AngleAxis(Random.Range(0f, 360f), bestContact.normal);
+            }
+
+            var decalGO = Instantiate(decalPrefab, bestContact.point, rot);
+
+            // Try to assign a unique material per instance with a random texture
+            var projector = decalGO.GetComponent<DecalProjector>();
+            if (projector != null)
+            {
+                Material sourceMat = decalBaseMaterial != null ? decalBaseMaterial : projector.material;
+                if (sourceMat != null)
+                {
+                    var instancedMat = new Material(sourceMat);
+
+                    // Pick random texture if available
+                    Texture2D chosen = null;
+                    if (decalTextures != null && decalTextures.Length > 0)
+                    {
+                        int idx = Random.Range(0, decalTextures.Length);
+                        chosen = decalTextures[idx];
+                    }
+
+                    if (chosen != null)
+                    {
+                        // Common URP Decal texture property names
+                        if (instancedMat.HasProperty("_BaseMap")) instancedMat.SetTexture("_BaseMap", chosen);
+                        if (instancedMat.HasProperty("_BaseColorMap")) instancedMat.SetTexture("_BaseColorMap", chosen);
+                        if (instancedMat.HasProperty("Base_Map")) instancedMat.SetTexture("Base_Map", chosen);
+                    }
+
+                    projector.material = instancedMat;
+                }
+            }
+        }
 
         // Camera feedback based on punch speed
         cameraFx?.Impulse(Mathf.Clamp01(punchSpeed / 18f));
