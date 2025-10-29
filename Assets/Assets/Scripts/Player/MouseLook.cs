@@ -16,6 +16,7 @@ public class MouseLook : MonoBehaviour
     [SerializeField] private InputActionProperty lookAction; // Vector2
 
     private float pitch;
+    private Vector2 pendingDelta;
 
     private void OnEnable()
     {
@@ -33,15 +34,22 @@ public class MouseLook : MonoBehaviour
 
     private void Update()
     {
+        // Accumulate mouse delta
         Vector2 delta = lookAction.action != null ? lookAction.action.ReadValue<Vector2>() : Vector2.zero;
-        Vector2 scaled = delta * sensitivity;
+        pendingDelta += delta * sensitivity;
+    }
 
-        transform.Rotate(Vector3.up, scaled.x, Space.Self);
+    private void FixedUpdate()
+    {
+        // Apply rotation in FixedUpdate to stay in sync with physics/joints
+        Vector2 apply = pendingDelta;
+        pendingDelta = Vector2.zero;
 
-        // Pitch on camera pivot
+        transform.Rotate(Vector3.up, apply.x, Space.Self);
+
         if (cameraPivot != null)
         {
-            pitch = Mathf.Clamp(pitch - scaled.y, minPitch, maxPitch);
+            pitch = Mathf.Clamp(pitch - apply.y, minPitch, maxPitch);
             cameraPivot.localEulerAngles = new Vector3(pitch, 0f, 0f);
         }
     }

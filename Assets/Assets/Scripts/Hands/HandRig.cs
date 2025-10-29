@@ -17,8 +17,8 @@ public class HandRig : MonoBehaviour
     [SerializeField] private Rigidbody rightHand;
 
     [Header("Joint Tuning")]
-    [SerializeField] private float linearSpring = 1200f;
-    [SerializeField] private float linearDamping = 70f;
+    [SerializeField] private float linearSpring = 1400f;
+    [SerializeField] private float linearDamping = 90f;
     [SerializeField] private float maxForce = 20000f;
     [SerializeField] private float slackMeters = 0.02f; // ~2 cm slack
 
