@@ -65,15 +65,19 @@ public class HandRig : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Apply charge pullback by moving sockets locally (stable and intuitive)
+        ApplySocketPullback(leftSocket, leftBaseLocalPos, leftFistPunch);
+        ApplySocketPullback(rightSocket, rightBaseLocalPos, rightFistPunch);
+        
         // Update connectedAnchor each physics step so joints follow sockets as the player rotates
         if (leftJoint != null && leftSocket != null)
             leftJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(leftSocket.position);
         if (rightJoint != null && rightSocket != null)
             rightJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(rightSocket.position);
-
-        // Apply charge pullback by moving sockets locally (stable and intuitive)
-        ApplySocketPullback(leftSocket, leftBaseLocalPos, leftFistPunch);
-        ApplySocketPullback(rightSocket, rightBaseLocalPos, rightFistPunch);
+        
+        // Increase reach to compensate for pullback - ensures charged punches reach same distance
+        UpdateJointReachForCharge(leftJoint, leftFistPunch);
+        UpdateJointReachForCharge(rightJoint, rightFistPunch);
     }
 
     private void ApplySocketPullback(Transform socket, Vector3 baseLocalPos, FistPunch fistPunch)
@@ -96,6 +100,31 @@ public class HandRig : MonoBehaviour
         float pullback = chargeProgress * maxPullbackDistance;
         Vector3 localOffset = new Vector3(0f, 0f, -pullback);
         socket.localPosition = baseLocalPos + localOffset;
+    }
+
+    /// <summary>
+    /// Dynamically increases joint reach limit when charging to compensate for pullback.
+    /// This ensures charged punches can reach the same distance as uncharged ones.
+    /// </summary>
+    private void UpdateJointReachForCharge(ConfigurableJoint joint, FistPunch fistPunch)
+    {
+        if (joint == null || fistPunch == null) return;
+
+        float chargeProgress = fistPunch.ChargeProgress;
+        if (chargeProgress <= 0f)
+        {
+            // Reset to base reach when not charging
+            var baseLimit = new SoftJointLimit { limit = slackMeters };
+            joint.linearLimit = baseLimit;
+            return;
+        }
+
+        // Compensate pullback by increasing reach by the same amount
+        float pullbackAmount = chargeProgress * maxPullbackDistance;
+        float effectiveReach = slackMeters + pullbackAmount;
+        
+        var limit = new SoftJointLimit { limit = Mathf.Max(0.001f, effectiveReach) };
+        joint.linearLimit = limit;
     }
 
     private ConfigurableJoint SetupJoint(Rigidbody hand, Transform socket)
