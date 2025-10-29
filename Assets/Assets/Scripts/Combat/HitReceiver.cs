@@ -65,8 +65,10 @@ public class HitReceiver : MonoBehaviour
 
         // Camera feedback based on punch speed
         cameraFx?.Impulse(Mathf.Clamp01(punchSpeed / 18f));
-        if (punchSpeed > critSpeed)
+        if (punchSpeed > critSpeed){
+            Debug.Log("SlowMoKick");
             cameraFx?.SlowMoKick();
+        }
     }
 }
 

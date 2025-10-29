@@ -1,23 +1,28 @@
 using UnityEngine;
-using Cinemachine;
 using System.Collections;
 
 /// <summary>
-/// Camera feedback helper for hits: generates Cinemachine impulse
-/// and triggers a short time slowdown (slow motion) with smooth recovery.
-/// Attach this to the Main Camera (or a child) and assign a
-/// CinemachineImpulseSource.
+/// Camera feedback helper for hits: direct camera shake and slow motion.
 /// </summary>
 public class CameraFX : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private CinemachineImpulseSource impulse;
+    [Header("Camera Shake")]
+    [SerializeField] private float shakeDuration = 0.2f;
+    [SerializeField] private float maxShakeAmount = 0.015f;
 
     [Header("Slow Motion")]
     [Tooltip("TimeScale over time; x = seconds (unscaled), y = timeScale")] 
     [SerializeField] private AnimationCurve slowMoCurve = null;
     [Tooltip("Duration to blend timeScale back to 1.0 after the curve ends")] 
     [SerializeField] private float returnDuration = 0.25f;
+
+    private Vector3 originalLocalPosition;
+    private float currentShakeDuration;
+
+    private void Awake()
+    {
+        originalLocalPosition = transform.localPosition;
+    }
 
     private void Reset()
     {
@@ -26,14 +31,31 @@ public class CameraFX : MonoBehaviour
             slowMoCurve = AnimationCurve.EaseInOut(0f, 1f, 0.15f, 0.3f);
     }
 
+    private void Update()
+    {
+        if (currentShakeDuration > 0f)
+        {
+            currentShakeDuration -= Time.deltaTime;
+            if (currentShakeDuration <= 0f)
+            {
+                transform.localPosition = originalLocalPosition;
+                currentShakeDuration = 0f;
+            }
+            else
+            {
+                float shakeAmount = (currentShakeDuration / shakeDuration) * maxShakeAmount;
+                transform.localPosition = originalLocalPosition + Random.insideUnitSphere * shakeAmount;
+            }
+        }
+    }
+
     /// <summary>
-    /// Generates a camera impulse. Typical strength range is 0..1,
+    /// Triggers camera shake. Typical strength range is 0..1,
     /// but any positive value will work.
     /// </summary>
     public void Impulse(float strength)
     {
-        if (impulse != null)
-            impulse.GenerateImpulse(strength);
+        currentShakeDuration = shakeDuration * Mathf.Clamp01(strength);
     }
 
     /// <summary>
