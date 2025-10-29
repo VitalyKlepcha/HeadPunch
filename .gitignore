@@ -20,6 +20,8 @@ ProjectSettings/ProjectVersion.txt
 *.unityproj
 *.sln
 *.mp4
+PLAN.md
+PLAN.md.meta
 .vs
 tags
 
