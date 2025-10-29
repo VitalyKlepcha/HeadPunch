@@ -371,6 +371,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7fbd2fd20fcb045aeb6e1f3fccbf00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shakeDuration: 0.2
+  maxShakeAmount: 0.015
   slowMoCurve:
     serializedVersion: 2
     m_Curve:
@@ -716,7 +718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageScale: 0.1
-  critSpeed: 8
+  critSpeed: 20
   health: {fileID: 2066287655}
   cameraFx: {fileID: 330585549}
   bloodFxPrefab: {fileID: 7161421086057268461, guid: c25d9fa477678484cb14c18ebc44aebc,
@@ -994,10 +996,13 @@ MonoBehaviour:
   rightSocket: {fileID: 313880380}
   leftHand: {fileID: 1946591583}
   rightHand: {fileID: 1206473151}
+  leftFistPunch: {fileID: 0}
+  rightFistPunch: {fileID: 0}
   linearSpring: 800
   linearDamping: 50
   maxForce: 10000
-  slackMeters: 0.02
+  slackMeters: 0.1
+  maxPullbackDistance: 0.15
 --- !u!114 &1335264152
 MonoBehaviour:
   m_ObjectHideFlags: 0

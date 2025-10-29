@@ -24,7 +24,7 @@ public class HandRig : MonoBehaviour
     [SerializeField] private float linearSpring = 1400f;
     [SerializeField] private float linearDamping = 90f;
     [SerializeField] private float maxForce = 20000f;
-    [SerializeField] private float slackMeters = 0.02f; // ~2 cm slack
+    [SerializeField] private float slackMeters = 0.1f; // Max distance fist can travel from socket
 
     [Header("Charge Pullback")]
     [SerializeField] private float maxPullbackDistance = 0.15f; // meters to pull back when fully charged
@@ -92,7 +92,7 @@ public class HandRig : MonoBehaviour
             return;
         }
 
-        // Move the socket backward in its own local space (negative Z)
+        // Move the socket backward in its own local space 
         float pullback = chargeProgress * maxPullbackDistance;
         Vector3 localOffset = new Vector3(0f, 0f, -pullback);
         socket.localPosition = baseLocalPos + localOffset;

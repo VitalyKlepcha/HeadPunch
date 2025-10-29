@@ -12,9 +12,9 @@ public class CameraFX : MonoBehaviour
 
     [Header("Slow Motion")]
     [Tooltip("TimeScale over time; x = seconds (unscaled), y = timeScale")] 
-    [SerializeField] private AnimationCurve slowMoCurve = null;
+    private AnimationCurve slowMoCurve = null;
     [Tooltip("Duration to blend timeScale back to 1.0 after the curve ends")] 
-    [SerializeField] private float returnDuration = 0.25f;
+    [SerializeField] private float returnDuration = 0.5f;
 
     private Vector3 originalLocalPosition;
     private float currentShakeDuration;
@@ -22,13 +22,19 @@ public class CameraFX : MonoBehaviour
     private void Awake()
     {
         originalLocalPosition = transform.localPosition;
+        
+        // Ensure slowMoCurve is initialized if null
+        if (slowMoCurve == null || slowMoCurve.length < 2)
+        {
+            slowMoCurve = AnimationCurve.EaseInOut(0f, 0.2f, 0.4f, 0.2f);
+        }
     }
 
     private void Reset()
     {
         // Provide a default curve if none is set
         if (slowMoCurve == null || slowMoCurve.length < 2)
-            slowMoCurve = AnimationCurve.EaseInOut(0f, 1f, 0.15f, 0.3f);
+            slowMoCurve = AnimationCurve.EaseInOut(0f, 0.2f, 0.4f, 0.2f);
     }
 
     private void Update()
@@ -69,14 +75,18 @@ public class CameraFX : MonoBehaviour
 
     private IEnumerator SlowMoRoutine()
     {
-        float duration = slowMoCurve != null && slowMoCurve.length > 0
-            ? slowMoCurve[slowMoCurve.length - 1].time
-            : 0.15f;
+        // Ensure curve is valid - create default if needed
+        if (slowMoCurve == null || slowMoCurve.length < 2)
+        {
+            slowMoCurve = AnimationCurve.EaseInOut(0f, 0.2f, 0.4f, 0.2f);
+        }
+
+        float duration = slowMoCurve[slowMoCurve.length - 1].time;
 
         float t = 0f;
         while (t < duration)
         {
-            float scale = slowMoCurve != null ? slowMoCurve.Evaluate(t) : 0.3f;
+            float scale = slowMoCurve.Evaluate(t);
             Time.timeScale = Mathf.Clamp(scale, 0.05f, 1f);
             Time.fixedDeltaTime = 0.02f * Time.timeScale;
             t += Time.unscaledDeltaTime;
