@@ -373,30 +373,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shakeDuration: 0.2
   maxShakeAmount: 0.015
-  slowMoCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.15
-      value: 0.3
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   returnDuration: 0.25
 --- !u!1 &410087039
 GameObject:
@@ -611,7 +587,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 758c3e6bd083861428d2fb66c7a9dc7a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -721,8 +697,7 @@ MonoBehaviour:
   critSpeed: 20
   health: {fileID: 2066287655}
   cameraFx: {fileID: 330585549}
-  bloodFxPrefab: {fileID: 7161421086057268461, guid: c25d9fa477678484cb14c18ebc44aebc,
-    type: 3}
+  bloodFxPrefab: {fileID: 19886758, guid: 077b011014108d74e97eefc46fce2c0a, type: 3}
   decalPrefab: {fileID: 5222660500400418166, guid: e0e9d7ead64436b45bd7d641aa4e187c,
     type: 3}
 --- !u!1 &832575517
@@ -1499,6 +1474,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
+  renderers:
+  - {fileID: 641759025}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
