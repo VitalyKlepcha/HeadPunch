@@ -1,0 +1,94 @@
+using UnityEngine;
+
+/// Creates short spring joints from hand rigidbodies to sockets on the player.
+/// Hands are connected to a kinematic player Rigidbody so they move with the body
+/// and don't get dragged by world-space target positions.
+public class HandRig : MonoBehaviour
+{
+    [Header("Player Rigidbody (kinematic)")]
+    [SerializeField] private Rigidbody playerRb; // Add kinematic RB on PlayerRoot
+
+    [Header("Sockets (children of the player)")]
+    [SerializeField] private Transform leftSocket;
+    [SerializeField] private Transform rightSocket;
+
+    [Header("Hand Rigidbodies")]
+    [SerializeField] private Rigidbody leftHand;
+    [SerializeField] private Rigidbody rightHand;
+
+    [Header("Joint Tuning")]
+    [SerializeField] private float linearSpring = 1200f;
+    [SerializeField] private float linearDamping = 70f;
+    [SerializeField] private float maxForce = 20000f;
+    [SerializeField] private float slackMeters = 0.02f; // ~2 cm slack
+
+    private ConfigurableJoint leftJoint;
+    private ConfigurableJoint rightJoint;
+
+    private void Awake()
+    {
+        if (playerRb == null)
+        {
+            // Ensure a kinematic RB exists on the player root
+            playerRb = GetComponent<Rigidbody>();
+            if (playerRb == null) playerRb = gameObject.AddComponent<Rigidbody>();
+            playerRb.isKinematic = true;
+        }
+
+        leftJoint = SetupJoint(leftHand, leftSocket);
+        rightJoint = SetupJoint(rightHand, rightSocket);
+    }
+
+    private void FixedUpdate()
+    {
+        // Update connectedAnchor each physics step so joints follow sockets as the player rotates
+        if (leftJoint != null && leftSocket != null)
+            leftJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(leftSocket.position);
+        if (rightJoint != null && rightSocket != null)
+            rightJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(rightSocket.position);
+    }
+
+    private ConfigurableJoint SetupJoint(Rigidbody hand, Transform socket)
+    {
+        if (hand == null || socket == null) return null;
+
+        // Start at socket position
+        hand.position = socket.position;
+
+        var joint = hand.GetComponent<ConfigurableJoint>();
+        if (joint == null) joint = hand.gameObject.AddComponent<ConfigurableJoint>();
+
+        joint.connectedBody = playerRb;
+        joint.autoConfigureConnectedAnchor = false;
+        joint.connectedAnchor = playerRb.transform.InverseTransformPoint(socket.position);
+        joint.anchor = Vector3.zero;
+
+        joint.xMotion = ConfigurableJointMotion.Limited;
+        joint.yMotion = ConfigurableJointMotion.Limited;
+        joint.zMotion = ConfigurableJointMotion.Limited;
+
+        joint.angularXMotion = ConfigurableJointMotion.Locked;
+        joint.angularYMotion = ConfigurableJointMotion.Locked;
+        joint.angularZMotion = ConfigurableJointMotion.Locked;
+
+        var limit = new SoftJointLimit { limit = Mathf.Max(0.001f, slackMeters) };
+        joint.linearLimit = limit;
+
+        var drive = new JointDrive
+        {
+            positionSpring = linearSpring,
+            positionDamper = linearDamping,
+            maximumForce = maxForce
+        };
+        joint.xDrive = drive;
+        joint.yDrive = drive;
+        joint.zDrive = drive;
+
+        // We drive to zero because connectedAnchor is set to socket position
+        joint.targetPosition = Vector3.zero;
+
+        return joint;
+    }
+}
+
+
