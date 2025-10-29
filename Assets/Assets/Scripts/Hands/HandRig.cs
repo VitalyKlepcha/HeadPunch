@@ -16,14 +16,24 @@ public class HandRig : MonoBehaviour
     [SerializeField] private Rigidbody leftHand;
     [SerializeField] private Rigidbody rightHand;
 
+    [Header("FistPunch Components (for charge feedback)")]
+    [SerializeField] private FistPunch leftFistPunch;
+    [SerializeField] private FistPunch rightFistPunch;
+
     [Header("Joint Tuning")]
     [SerializeField] private float linearSpring = 1400f;
     [SerializeField] private float linearDamping = 90f;
     [SerializeField] private float maxForce = 20000f;
     [SerializeField] private float slackMeters = 0.02f; // ~2 cm slack
 
+    [Header("Charge Pullback")]
+    [SerializeField] private float maxPullbackDistance = 0.15f; // meters to pull back when fully charged
+    private Vector3 leftBaseLocalPos;
+    private Vector3 rightBaseLocalPos;
+
     private ConfigurableJoint leftJoint;
     private ConfigurableJoint rightJoint;
+    private Transform forwardSource; // Camera or similar for forward direction
 
     private void Awake()
     {
@@ -34,6 +44,20 @@ public class HandRig : MonoBehaviour
             if (playerRb == null) playerRb = gameObject.AddComponent<Rigidbody>();
             playerRb.isKinematic = true;
         }
+
+        // Find forward source (usually camera) for pullback direction
+        if (forwardSource == null && Camera.main != null)
+            forwardSource = Camera.main.transform;
+
+        // Auto-find FistPunch components if not assigned
+        if (leftFistPunch == null && leftHand != null)
+            leftFistPunch = leftHand.GetComponent<FistPunch>();
+        if (rightFistPunch == null && rightHand != null)
+            rightFistPunch = rightHand.GetComponent<FistPunch>();
+
+        // Cache base local positions of sockets for visual offsets during charge
+        if (leftSocket != null) leftBaseLocalPos = leftSocket.localPosition;
+        if (rightSocket != null) rightBaseLocalPos = rightSocket.localPosition;
 
         leftJoint = SetupJoint(leftHand, leftSocket);
         rightJoint = SetupJoint(rightHand, rightSocket);
@@ -46,6 +70,32 @@ public class HandRig : MonoBehaviour
             leftJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(leftSocket.position);
         if (rightJoint != null && rightSocket != null)
             rightJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(rightSocket.position);
+
+        // Apply charge pullback by moving sockets locally (stable and intuitive)
+        ApplySocketPullback(leftSocket, leftBaseLocalPos, leftFistPunch);
+        ApplySocketPullback(rightSocket, rightBaseLocalPos, rightFistPunch);
+    }
+
+    private void ApplySocketPullback(Transform socket, Vector3 baseLocalPos, FistPunch fistPunch)
+    {
+        if (socket == null) return;
+        if (fistPunch == null)
+        {
+            socket.localPosition = baseLocalPos;
+            return;
+        }
+
+        float chargeProgress = fistPunch.ChargeProgress;
+        if (chargeProgress <= 0f)
+        {
+            socket.localPosition = baseLocalPos;
+            return;
+        }
+
+        // Move the socket backward in its own local space (negative Z)
+        float pullback = chargeProgress * maxPullbackDistance;
+        Vector3 localOffset = new Vector3(0f, 0f, -pullback);
+        socket.localPosition = baseLocalPos + localOffset;
     }
 
     private ConfigurableJoint SetupJoint(Rigidbody hand, Transform socket)

@@ -31,6 +31,17 @@ public class FistPunch : MonoBehaviour
     public bool IsPunchActive => (Time.time - LastPunchTime) < punchActiveWindow;
     public float LastPunchVelocity { get; private set; }
     public float LastPunchTime { get; private set; } = -999f;
+    
+    // Charge progress for visual feedback (0-1)
+    public float ChargeProgress
+    {
+        get
+        {
+            if (!enableCharge || !isHeld) return 0f;
+            float held = Mathf.Max(0f, Time.time - pressTime);
+            return Mathf.Clamp01(held / Mathf.Max(0.0001f, fullChargeTime));
+        }
+    }
 
     private void Reset()
     {
