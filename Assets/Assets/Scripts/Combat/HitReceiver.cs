@@ -105,9 +105,7 @@ public class HitReceiver : MonoBehaviour
 
                     if (chosen != null)
                     {
-                        // Common URP Decal texture property names
                         if (instancedMat.HasProperty("_BaseMap")) instancedMat.SetTexture("_BaseMap", chosen);
-                        if (instancedMat.HasProperty("_BaseColorMap")) instancedMat.SetTexture("_BaseColorMap", chosen);
                         if (instancedMat.HasProperty("Base_Map")) instancedMat.SetTexture("Base_Map", chosen);
                     }
 

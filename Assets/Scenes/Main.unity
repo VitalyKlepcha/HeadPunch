@@ -1021,8 +1021,8 @@ MonoBehaviour:
   rightSocket: {fileID: 313880380}
   leftHand: {fileID: 1946591583}
   rightHand: {fileID: 1206473151}
-  leftFistPunch: {fileID: 0}
-  rightFistPunch: {fileID: 0}
+  leftFistPunch: {fileID: 1946591588}
+  rightFistPunch: {fileID: 1206473156}
   linearSpring: 800
   linearDamping: 50
   maxForce: 10000
@@ -1074,6 +1074,9 @@ MonoBehaviour:
   sprintSpeed: 6.5
   gravity: -9.81
   groundSnap: -2
+  baseJumpVelocity: 3
+  maxJumpMultiplier: 2.5
+  fullChargeTime: 1.2
   moveAction:
     m_UseReference: 1
     m_Action:
@@ -1099,6 +1102,19 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -6620550168624987929, guid: bee89011fbc202f42afa61544193159f,
+      type: 3}
+  jumpAction:
+    m_UseReference: 1
+    m_Action:
+      m_Name: Jump
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: 508ce139-ea94-4092-ab64-bf92270018cb
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: -4515489063012870341, guid: bee89011fbc202f42afa61544193159f,
       type: 3}
 --- !u!143 &1335264154
 CharacterController:
@@ -1172,6 +1188,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: c1d2f3a4-0005-4a5b-8c6d-7e8f9a0b1c01
     m_ActionName: Gameplay/PunchRight[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c1d2f3a4-0006-4a5b-8c6d-7e8f9a0b1c01
+    m_ActionName: Gameplay/Jump[/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
