@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="UnityEngine.UIElements.schema">
+  <ui:VisualElement name="root">
+    <ui:VisualElement name="healthBar">
+      <ui:VisualElement name="healthFill" />
+      <ui:VisualElement name="healthGlow" />
+    </ui:VisualElement>
+    <ui:VisualElement name="comboContainer">
+      <ui:Label name="comboLabel" text="COMBO" />
+      <ui:Label name="comboValue" text="0" />
+      <ui:Label name="comboX" text="x" />
+    </ui:VisualElement>
+    <ui:Label name="victoryText" text="Победа" />
+  </ui:VisualElement>
+</ui:UXML>

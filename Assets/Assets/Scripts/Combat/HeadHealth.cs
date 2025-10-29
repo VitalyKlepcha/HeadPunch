@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// Tracks head health and exposes damage ratio for visuals.
@@ -13,9 +14,13 @@ public class HeadHealth : MonoBehaviour
     
     private static readonly int DamagePropertyID = Shader.PropertyToID("_Damage");
 
+    public event Action OnDeath;
+    private bool isDead;
+
     private void Awake()
     {
         currentHealth = maxHealth;
+        isDead = false;
         
         // Auto-find renderers if not assigned
         if (renderers == null || renderers.Length == 0)
@@ -32,8 +37,15 @@ public class HeadHealth : MonoBehaviour
     public void AddDamage(float amount)
     {
         if (amount <= 0f) return;
+        if (isDead) return;
         currentHealth = Mathf.Max(0f, currentHealth - amount);
         UpdateDamageVisuals();
+
+        if (!isDead && currentHealth <= 0f)
+        {
+            isDead = true;
+            OnDeath?.Invoke();
+        }
     }
     
     private void UpdateDamageVisuals()
@@ -59,6 +71,7 @@ public class HeadHealth : MonoBehaviour
     public void ResetHealth()
     {
         currentHealth = maxHealth;
+        isDead = false;
         UpdateDamageVisuals();
     }
 }

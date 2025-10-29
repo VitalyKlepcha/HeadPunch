@@ -916,6 +916,70 @@ MonoBehaviour:
   maxChargeMultiplier: 2
   fullChargeTime: 0.7
   punchActiveWindow: 0.2
+--- !u!1 &1219337761
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1219337763}
+  - component: {fileID: 1219337762}
+  - component: {fileID: 1219337764}
+  m_Layer: 0
+  m_Name: HUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1219337762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1219337761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 0f291378d4585574a9eae6fd9dff36c5, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 8d82f585cfe039b43a5aa2ea82167ccc,
+    type: 3}
+  m_SortingOrder: 0
+--- !u!4 &1219337763
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1219337761}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.26081568, y: 0.6136372, z: 4.3419924}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1219337764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1219337761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1ddd219fcc48744e83d9e3195e75aed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  headHealth: {fileID: 2066287655}
+  uiDocument: {fileID: 1219337762}
 --- !u!1 &1335264149
 GameObject:
   m_ObjectHideFlags: 0
@@ -1437,6 +1501,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2066287653}
   - component: {fileID: 2066287655}
+  - component: {fileID: 2066287656}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -1476,6 +1541,22 @@ MonoBehaviour:
   currentHealth: 0
   renderers:
   - {fileID: 641759025}
+--- !u!114 &2066287656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066287652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87978588e38455e449928268e1a866c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  headHealth: {fileID: 2066287655}
+  cameraFx: {fileID: 330585549}
+  headUI: {fileID: 1219337764}
+  restartDelay: 1.5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1485,3 +1566,4 @@ SceneRoots:
   - {fileID: 46183632}
   - {fileID: 2066287653}
   - {fileID: 1335264150}
+  - {fileID: 1219337763}

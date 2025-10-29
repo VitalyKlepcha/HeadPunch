@@ -6,11 +6,12 @@ public class HitReceiver : MonoBehaviour
 {
     [Header("Damage")] 
     [SerializeField] private float damageScale = 0.18f;    // damage per m/s of punch velocity
-    [SerializeField] private float critSpeed = 15f;        // m/s threshold to trigger slow-mo
+    [SerializeField] private float critSpeed = 20f;        // m/s threshold to trigger slow-mo
 
     [Header("References")] 
     [SerializeField] private HeadHealth health;
-    [SerializeField] private CameraFX cameraFx;             
+    [SerializeField] private CameraFX cameraFx;
+    [SerializeField] private ComboTracker comboTracker;             
 
     [Header("FX Prefabs (optional)")]
     [SerializeField] private ParticleSystem bloodFxPrefab;
@@ -56,6 +57,9 @@ public class HitReceiver : MonoBehaviour
         // Apply damage based on stored punch velocity
         float dmg = punchSpeed * damageScale;
         health?.AddDamage(dmg);
+        
+        // Register combo hit
+        comboTracker?.RegisterHit();
 
         // Spawn FX at contact point
         if (bloodFxPrefab != null)
