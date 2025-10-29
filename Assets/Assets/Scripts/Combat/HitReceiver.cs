@@ -70,9 +70,26 @@ public class HitReceiver : MonoBehaviour
         // Register combo hit
         comboTracker?.RegisterHit();
 
+        // Play hit sound (light or heavy based on punch speed)
+        bool isHeavy = punchSpeed > critSpeed;
+        if (AudioManager.Instance != null)
+        {
+            if (isHeavy)
+                AudioManager.Instance.PlayHitHeavyAt(bestContact.point);
+            else
+                AudioManager.Instance.PlayHitLightAt(bestContact.point);
+        }
+
         // Spawn blood particles at contact point (optional)
+        ParticleSystem bloodFx = null;
         if (bloodFxPrefab != null)
-            Instantiate(bloodFxPrefab, bestContact.point, Quaternion.LookRotation(bestContact.normal));
+            bloodFx = Instantiate(bloodFxPrefab, bestContact.point, Quaternion.LookRotation(bestContact.normal));
+
+        // Play blood splat sound when blood effect spawns
+        if (bloodFx != null && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBloodSplatAt(bestContact.point);
+        }
 
         // Only spawn decal on critical hits
         bool isCritical = punchSpeed > critSpeed;

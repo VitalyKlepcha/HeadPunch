@@ -75,12 +75,26 @@ public class FistPunch : MonoBehaviour
     {
         isHeld = true;
         pressTime = Time.time;
+        
+        // Start charge loop if charging is enabled
+        if (enableCharge && AudioManager.Instance != null && fistRb != null)
+        {
+            AudioManager.Instance.StartChargeLoop(fistRb.transform);
+        }
+        
         TryPunchIfNoCharge();
     }
 
     private void OnPunchCanceled(InputAction.CallbackContext ctx)
     {
         if (!enableCharge) { isHeld = false; return; }
+        
+        // Stop charge loop when releasing
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.StopChargeLoop();
+        }
+        
         float held = Mathf.Max(0f, Time.time - pressTime);
         float t = Mathf.Clamp01(held / Mathf.Max(0.0001f, fullChargeTime));
         float mul = Mathf.Lerp(1f, maxChargeMultiplier, t);
