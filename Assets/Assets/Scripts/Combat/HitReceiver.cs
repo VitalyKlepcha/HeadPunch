@@ -56,6 +56,9 @@ public class HitReceiver : MonoBehaviour
         // Only apply damage if punch is active (within punch window)
         if (!fistPunch.IsPunchActive) return;
 
+        // Enforce one damage application per fist per punch
+        if (!fistPunch.TryConsumeHitThisPunch()) return;
+
         ContactPoint bestContact = c.GetContact(0);
         
         // Use stored punch velocity directly (bypass all physics readings)

@@ -12,7 +12,7 @@ public class HeadHealth : MonoBehaviour
 
     public float DamageRatio => 1f - Mathf.Clamp01(currentHealth / Mathf.Max(0.0001f, maxHealth));
     
-    private static readonly int DamagePropertyID = Shader.PropertyToID("_Damage");
+    private static readonly int DamagePropertyID = Shader.PropertyToID("_Blood_rate");
 
     public event Action OnDeath;
     private bool isDead;
@@ -53,11 +53,9 @@ public class HeadHealth : MonoBehaviour
         float damageRatio = DamageRatio;
         
         if (renderers == null) return;
-        
         foreach (var renderer in renderers)
         {
             if (renderer == null) continue;
-            
             foreach (var material in renderer.materials)
             {
                 if (material.HasProperty(DamagePropertyID))

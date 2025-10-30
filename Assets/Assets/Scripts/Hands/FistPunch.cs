@@ -27,6 +27,9 @@ public class FistPunch : MonoBehaviour
     private float pressTime;
     private bool isHeld;
     
+    // Ensures only one damage application per punch per fist
+    private bool hasDealtDamageThisPunch;
+    
     // Punch state for damage calculation
     public bool IsPunchActive => (Time.time - LastPunchTime) < punchActiveWindow;
     public float LastPunchVelocity { get; private set; }
@@ -119,11 +122,24 @@ public class FistPunch : MonoBehaviour
         // Store for damage calculation
         LastPunchVelocity = actualVelocity;
         LastPunchTime = Time.time;
+        
+        // Reset hit token at the start of each punch so only the first contact deals damage
+        hasDealtDamageThisPunch = false;
 
         // VelocityChange gives an immediate change not dependent on mass
         Vector3 dir = forwardSource.forward;
         Vector3 dv = dir * actualVelocity;
         fistRb.AddForce(dv, ForceMode.VelocityChange);
+    }
+
+    /// Attempts to consume the per-punch hit token.
+    /// Returns true only once per punch; subsequent calls until next punch return false.
+    public bool TryConsumeHitThisPunch()
+    {
+        if (!IsPunchActive) return false; // Outside active window we don't consume/allow
+        if (hasDealtDamageThisPunch) return false;
+        hasDealtDamageThisPunch = true;
+        return true;
     }
 }
 
