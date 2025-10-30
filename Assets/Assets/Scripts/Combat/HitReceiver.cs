@@ -13,6 +13,7 @@ public class HitReceiver : MonoBehaviour
     [SerializeField] private HeadHealth health;
     [SerializeField] private CameraFX cameraFx;
     [SerializeField] private ComboTracker comboTracker;             
+    [SerializeField] private Animator headAnimator;                 // animator on the head object
 
     [Header("FX Prefabs (optional)")]
     [SerializeField] private ParticleSystem bloodFxPrefab;
@@ -26,7 +27,11 @@ public class HitReceiver : MonoBehaviour
     [Tooltip("Randomly rotate decal around contact normal for variation.")]
     [SerializeField] private bool randomizeRotation = true;
 
+    [SerializeField] private Transform decalSpawnTransform; // Reference to the head transform where decals should be spawned
+
     private Rigidbody rb;
+    private float lastStrongHitTime;
+    [SerializeField] private float strongHitCooldown = 0.35f;       // seconds between strong-hit animations
 
     private void Awake()
     {
@@ -83,6 +88,31 @@ public class HitReceiver : MonoBehaviour
                 AudioManager.Instance.PlayHitLightAt(bestContact.point);
         }
 
+        // Determine whether impact is on the front side of the head
+        bool isFrontHit = false;
+        {
+            Vector3 toContact = bestContact.point - transform.position;
+            if (toContact.sqrMagnitude > 0.0001f)
+            {
+                float facingDot = Vector3.Dot(transform.forward, toContact.normalized);
+                isFrontHit = facingDot > 0.3f; // front hemisphere with small tolerance
+            }
+        }
+
+        // Trigger strong-hit animation only for heavy front impacts
+        if (isHeavy && isFrontHit && headAnimator != null)
+        {
+            bool canPlay = Time.time >= (lastStrongHitTime + strongHitCooldown);
+            var stateInfo = headAnimator.GetCurrentAnimatorStateInfo(0);
+            bool alreadyPlaying = stateInfo.IsName("TakeHit_Strong") || headAnimator.IsInTransition(0);
+            if (canPlay && !alreadyPlaying)
+            {
+                headAnimator.ResetTrigger("StrongHit");
+                headAnimator.SetTrigger("StrongHit");
+                lastStrongHitTime = Time.time;
+            }
+        }
+
         // Spawn blood particles at contact point (optional)
         ParticleSystem bloodFx = null;
         if (bloodFxPrefab != null)
@@ -104,7 +134,7 @@ public class HitReceiver : MonoBehaviour
                 rot *= Quaternion.AngleAxis(Random.Range(0f, 360f), bestContact.normal);
             }
 
-            var decalGO = Instantiate(decalPrefab, bestContact.point, rot);
+            var decalGO = Instantiate(decalPrefab, bestContact.point, rot, decalSpawnTransform);
 
             // Try to assign a unique material per instance with a random texture
             var projector = decalGO.GetComponent<DecalProjector>();
