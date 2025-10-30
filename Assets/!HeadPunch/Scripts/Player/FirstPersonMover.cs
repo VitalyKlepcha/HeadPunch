@@ -88,7 +88,6 @@ public class FirstPersonMover : MonoBehaviour
         float jumpVelocity = baseJumpVelocity * Mathf.Max(0.1f, multiplier);
         velocity.y = jumpVelocity;
         
-        Debug.Log($"Jump! Multiplier: {multiplier:F2}, Velocity: {jumpVelocity:F2}");
     }
 
     private void Update()

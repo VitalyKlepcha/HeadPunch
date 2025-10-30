@@ -69,7 +69,6 @@ public class HitReceiver : MonoBehaviour
         // Use stored punch velocity directly (bypass all physics readings)
         float punchSpeed = fistPunch.LastPunchVelocity;
         
-        Debug.Log($"Punch hit! Speed: {punchSpeed:F2} m/s (Active: {fistPunch.IsPunchActive})");
 
         // Apply damage based on stored punch velocity
         float dmg = punchSpeed * damageScale;
@@ -167,7 +166,6 @@ public class HitReceiver : MonoBehaviour
         // Camera feedback based on punch speed
         cameraFx?.Impulse(Mathf.Clamp01(punchSpeed / 18f));
         if (punchSpeed > critSpeed){
-            Debug.Log("SlowMoKick");
             cameraFx?.SlowMoKick();
         }
     }
