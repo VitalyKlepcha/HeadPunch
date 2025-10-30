@@ -1,12 +1,10 @@
 using UnityEngine;
 
-/// Creates short spring joints from hand rigidbodies to sockets on the player.
-/// Hands are connected to a kinematic player Rigidbody so they move with the body
-/// and don't get dragged by world-space target positions.
+/// Hands are connected to a kinematic player Rigidbody
 public class HandRig : MonoBehaviour
 {
     [Header("Player Rigidbody (kinematic)")]
-    [SerializeField] private Rigidbody playerRb; // Add kinematic RB on PlayerRoot
+    [SerializeField] private Rigidbody playerRb; // Kinematic
 
     [Header("Sockets (children of the player)")]
     [SerializeField] private Transform leftSocket;
@@ -33,19 +31,19 @@ public class HandRig : MonoBehaviour
 
     private ConfigurableJoint leftJoint;
     private ConfigurableJoint rightJoint;
-    private Transform forwardSource; // Camera or similar for forward direction
+    private Transform forwardSource; // Camera
 
     private void Awake()
     {
         if (playerRb == null)
         {
-            // Ensure a kinematic RB exists on the player root
+            // Ensure a kinematic Rigidbody
             playerRb = GetComponent<Rigidbody>();
             if (playerRb == null) playerRb = gameObject.AddComponent<Rigidbody>();
             playerRb.isKinematic = true;
         }
 
-        // Find forward source (usually camera) for pullback direction
+        // Find forward source
         if (forwardSource == null && Camera.main != null)
             forwardSource = Camera.main.transform;
 
@@ -55,7 +53,6 @@ public class HandRig : MonoBehaviour
         if (rightFistPunch == null && rightHand != null)
             rightFistPunch = rightHand.GetComponent<FistPunch>();
 
-        // Cache base local positions of sockets for visual offsets during charge
         if (leftSocket != null) leftBaseLocalPos = leftSocket.localPosition;
         if (rightSocket != null) rightBaseLocalPos = rightSocket.localPosition;
 
@@ -65,17 +62,17 @@ public class HandRig : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Apply charge pullback by moving sockets locally (stable and intuitive)
+        // Apply charge pullback by moving sockets locally
         ApplySocketPullback(leftSocket, leftBaseLocalPos, leftFistPunch);
         ApplySocketPullback(rightSocket, rightBaseLocalPos, rightFistPunch);
         
-        // Update connectedAnchor each physics step so joints follow sockets as the player rotates
+        // Update connectedAnchor each physics step so joints follow sockets
         if (leftJoint != null && leftSocket != null)
             leftJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(leftSocket.position);
         if (rightJoint != null && rightSocket != null)
             rightJoint.connectedAnchor = playerRb.transform.InverseTransformPoint(rightSocket.position);
         
-        // Increase reach to compensate for pullback - ensures charged punches reach same distance
+        // Increase reach to compensate for pullback
         UpdateJointReachForCharge(leftJoint, leftFistPunch);
         UpdateJointReachForCharge(rightJoint, rightFistPunch);
     }
@@ -102,10 +99,7 @@ public class HandRig : MonoBehaviour
         socket.localPosition = baseLocalPos + localOffset;
     }
 
-    /// <summary>
     /// Dynamically increases joint reach limit when charging to compensate for pullback.
-    /// This ensures charged punches can reach the same distance as uncharged ones.
-    /// </summary>
     private void UpdateJointReachForCharge(ConfigurableJoint joint, FistPunch fistPunch)
     {
         if (joint == null || fistPunch == null) return;
@@ -163,7 +157,7 @@ public class HandRig : MonoBehaviour
         joint.yDrive = drive;
         joint.zDrive = drive;
 
-        // We drive to zero because connectedAnchor is set to socket position
+        // Drive to zero because connectedAnchor is set to socket position
         joint.targetPosition = Vector3.zero;
 
         return joint;

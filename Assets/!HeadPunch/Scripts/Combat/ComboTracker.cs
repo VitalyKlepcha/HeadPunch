@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-/// Tracks combo hits and exposes current combo count with time-based decay.
+/// Tracks combo hits and exposes current combo
 public class ComboTracker : MonoBehaviour
 {
     [SerializeField] private float comboTimeout = 2.5f;
@@ -32,13 +32,13 @@ public class ComboTracker : MonoBehaviour
         lastHitTime = Time.time;
         hasCombo = true;
         
-        // Check for tier up (e.g., 5, 10, 15, 20)
+        // Check for tier up
         int currentTier = Mathf.FloorToInt(currentCombo / (float)tierInterval);
         if (currentTier > lastTierReached && currentCombo > 0)
         {
             lastTierReached = currentTier;
             
-            // Play combo tier up sound
+            // Play sound
             if (AudioManager.Instance != null)
             {
                 AudioManager.Instance.PlayComboTierUp();

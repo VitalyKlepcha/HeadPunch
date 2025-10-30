@@ -30,12 +30,11 @@ public class FistPunch : MonoBehaviour
     // Ensures only one damage application per punch per fist
     private bool hasDealtDamageThisPunch;
     
-    // Punch state for damage calculation
     public bool IsPunchActive => (Time.time - LastPunchTime) < punchActiveWindow;
     public float LastPunchVelocity { get; private set; }
     public float LastPunchTime { get; private set; } = -999f;
     
-    // Charge progress for visual feedback (0-1)
+    // Visual feedback (0-1)
     public float ChargeProgress
     {
         get
@@ -79,7 +78,7 @@ public class FistPunch : MonoBehaviour
         isHeld = true;
         pressTime = Time.time;
         
-        // Start charge loop if charging is enabled
+        // Start charge loop
         if (enableCharge && AudioManager.Instance != null && fistRb != null)
         {
             AudioManager.Instance.StartChargeLoop(fistRb.transform);
@@ -92,7 +91,7 @@ public class FistPunch : MonoBehaviour
     {
         if (!enableCharge) { isHeld = false; return; }
         
-        // Stop charge loop when releasing
+        // Stop charge loop
         if (AudioManager.Instance != null)
         {
             AudioManager.Instance.StopChargeLoop();
@@ -123,20 +122,17 @@ public class FistPunch : MonoBehaviour
         LastPunchVelocity = actualVelocity;
         LastPunchTime = Time.time;
         
-        // Reset hit token at the start of each punch so only the first contact deals damage
+        // Reset hit token
         hasDealtDamageThisPunch = false;
 
-        // VelocityChange gives an immediate change not dependent on mass
         Vector3 dir = forwardSource.forward;
         Vector3 dv = dir * actualVelocity;
         fistRb.AddForce(dv, ForceMode.VelocityChange);
     }
 
-    /// Attempts to consume the per-punch hit token.
-    /// Returns true only once per punch; subsequent calls until next punch return false.
     public bool TryConsumeHitThisPunch()
     {
-        if (!IsPunchActive) return false; // Outside active window we don't consume/allow
+        if (!IsPunchActive) return false;
         if (hasDealtDamageThisPunch) return false;
         hasDealtDamageThisPunch = true;
         return true;

@@ -1,9 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Camera feedback helper for hits: direct camera shake and slow motion.
-/// </summary>
+
+/// Camera feedback helper: direct camera shake and slow motion.
 public class CameraFX : MonoBehaviour
 {
     [Header("Camera Shake")]
@@ -55,18 +54,13 @@ public class CameraFX : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Triggers camera shake. Typical strength range is 0..1,
-    /// but any positive value will work.
-    /// </summary>
+    /// Triggers camera shake
     public void Impulse(float strength)
     {
         currentShakeDuration = shakeDuration * Mathf.Clamp01(strength);
     }
 
-    /// <summary>
     /// Triggers a brief slow-motion effect using the configured curve.
-    /// </summary>
     public void SlowMoKick()
     {
         StopAllCoroutines();

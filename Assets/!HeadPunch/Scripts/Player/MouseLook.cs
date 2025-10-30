@@ -41,7 +41,6 @@ public class MouseLook : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Apply rotation in FixedUpdate to stay in sync with physics/joints
         Vector2 apply = pendingDelta;
         pendingDelta = Vector2.zero;
 

@@ -2,13 +2,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// Handles victory flow when the head reaches 0 HP: slow-mo, show UI, restart scene.
+/// Slow-mo, show UI, restart scene.
 public class VictoryFlow : MonoBehaviour
 {
     [SerializeField] private HeadHealth headHealth;
     [SerializeField] private CameraFX cameraFx;
     [SerializeField] private HeadUI headUI;
-    [SerializeField] private float restartDelay = 1.5f; // seconds (unscaled)
+    [SerializeField] private float restartDelay = 1.5f; // seconds
 
     private bool handled;
 
