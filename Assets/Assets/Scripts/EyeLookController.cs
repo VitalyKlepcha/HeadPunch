@@ -1,10 +1,6 @@
 using UnityEngine;
 
-/// <summary>
 /// Rotates two eye transforms to smoothly look at a target (player root)
-/// while respecting yaw/pitch limits and locking roll. Runs in LateUpdate
-/// to play nicely with animation.
-/// </summary>
 public class EyeLookController : MonoBehaviour
 {
     [Header("Eye Transforms")]
@@ -46,7 +42,6 @@ public class EyeLookController : MonoBehaviour
             if (tagged != null) target = tagged.transform;
         }
 
-        // Build arrays for iteration
         eyes = new Transform[2] { leftEye, rightEye };
         initialLocalRotations = new Quaternion[2];
 
@@ -77,17 +72,15 @@ public class EyeLookController : MonoBehaviour
 
             if (!shouldTrack || distanceToTarget < minTrackingDistance || distanceToTarget > maxTrackingDistance)
             {
-                // Return toward forward (base) orientation
                 Quaternion desired = baseLocalRotation;
                 eye.localRotation = SmoothRotate(eye.localRotation, desired, rotationLerpSpeed);
                 continue;
             }
 
-            // Compute target direction in the eye's parent local space so we can cleanly limit yaw/pitch
+            // Compute target direction
             Transform parent = eye.parent;
             if (parent == null)
             {
-                // Without a parent, fall back to world space clamping relative to the eye's initial rotation
                 Quaternion desiredWorld = ComputeClampedWorldRotation(eye, worldTargetPos, baseLocalRotation);
                 eye.rotation = SmoothRotate(eye.rotation, desiredWorld, rotationLerpSpeed);
                 continue;
@@ -98,32 +91,28 @@ public class EyeLookController : MonoBehaviour
             Vector3 dirParent = (targetPosParentSpace - eyePosParentSpace).normalized;
 
             // Convert to yaw (around Y) and pitch (around X) in degrees
-            float yawDeg = Mathf.Atan2(dirParent.x, dirParent.z) * Mathf.Rad2Deg; // left/right
+            float yawDeg = Mathf.Atan2(dirParent.x, dirParent.z) * Mathf.Rad2Deg; 
             float pitchDeg = Mathf.Atan2(-dirParent.y, Mathf.Sqrt(dirParent.x * dirParent.x + dirParent.z * dirParent.z)) * Mathf.Rad2Deg; // up/down
 
             // Clamp to limits
             yawDeg = Mathf.Clamp(yawDeg, -maxYaw, maxYaw);
             pitchDeg = Mathf.Clamp(pitchDeg, -maxPitch, maxPitch);
 
-            // Lock roll by not applying any Z rotation; apply relative to the captured base rotation
             Quaternion desiredLocal = baseLocalRotation * Quaternion.Euler(pitchDeg, yawDeg, 0f);
 
-            // Smoothly rotate in local space
+            // Rotate in local space
             eye.localRotation = SmoothRotate(eye.localRotation, desiredLocal, rotationLerpSpeed);
         }
     }
 
     private static Quaternion SmoothRotate(Quaternion current, Quaternion target, float speed)
     {
-        // Exponential smoothing factor for framerate-independent feel
         float t = 1f - Mathf.Exp(-Mathf.Max(0f, speed) * Time.deltaTime);
         return Quaternion.Slerp(current, target, t);
     }
 
     private Quaternion ComputeClampedWorldRotation(Transform eye, Vector3 worldTarget, Quaternion baseLocal)
     {
-        // Fallback when eye has no parent: approximate by constructing a local-like frame from initial rotation
-        // Transform target direction into the eye's initial local frame
         Quaternion baseWorld = eye.rotation * Quaternion.Inverse(eye.localRotation) * baseLocal;
         Vector3 dirInBase = Quaternion.Inverse(baseWorld) * (worldTarget - eye.position).normalized;
 

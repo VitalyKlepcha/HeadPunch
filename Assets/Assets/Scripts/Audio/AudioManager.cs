@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System.Collections.Generic;
 
-/// Central audio manager using AudioMixer with SFX and UI groups.
-/// Handles 3D spatial sounds for gameplay and 2D sounds for UI.
+
 [DefaultExecutionOrder(-100)]
 public sealed class AudioManager : MonoBehaviour
 {
@@ -20,21 +19,18 @@ public sealed class AudioManager : MonoBehaviour
     [SerializeField] private AudioMixer masterMixer;
 
     [Header("3D Audio Settings")]
-    [SerializeField] private float spatialBlend3D = 1f; // Full 3D spatialization
+    [SerializeField] private float spatialBlend3D = 1f; 
     [SerializeField] private float minDistance = 1f;
     [SerializeField] private float maxDistance = 50f;
     [SerializeField] private int maxPooledSources = 10;
 
-    // Internal audio sources
     private Queue<AudioSource> pooledSources3D;
     private AudioSource chargeLoopSource;
     private AudioSource uiSource2D;
 
-    // Mixer groups
     private AudioMixerGroup sfxGroup;
     private AudioMixerGroup uiGroup;
 
-    // Charge loop tracking
     private Transform chargeFollowTarget;
 
     private void Awake()
@@ -55,7 +51,6 @@ public sealed class AudioManager : MonoBehaviour
 
     private void Update()
     {
-        // Update charge loop position if active
         if (chargeLoopSource != null && chargeLoopSource.isPlaying && chargeFollowTarget != null)
         {
             chargeLoopSource.transform.position = chargeFollowTarget.position;
@@ -100,7 +95,6 @@ public sealed class AudioManager : MonoBehaviour
 
     private void SetupDedicatedSources()
     {
-        // Setup charge loop source (3D, follows transform)
         GameObject chargeGo = new GameObject("ChargeLoopSource");
         chargeGo.transform.SetParent(transform);
         chargeLoopSource = chargeGo.AddComponent<AudioSource>();
@@ -108,11 +102,10 @@ public sealed class AudioManager : MonoBehaviour
         chargeLoopSource.loop = true;
         chargeLoopSource.outputAudioMixerGroup = sfxGroup;
 
-        // Setup UI source (2D, non-spatial)
         GameObject uiGo = new GameObject("UISource");
         uiGo.transform.SetParent(transform);
         uiSource2D = uiGo.AddComponent<AudioSource>();
-        uiSource2D.spatialBlend = 0f; // 2D
+        uiSource2D.spatialBlend = 0f;
         uiSource2D.outputAudioMixerGroup = uiGroup;
         uiSource2D.playOnAwake = false;
     }
@@ -134,7 +127,7 @@ public sealed class AudioManager : MonoBehaviour
                 return source;
         }
 
-        // Create emergency source if pool exhausted
+        // Fallback when pool is empty
         GameObject go = new GameObject("EmergencyAudioSource");
         go.transform.SetParent(transform);
         AudioSource emergency = go.AddComponent<AudioSource>();
@@ -157,21 +150,18 @@ public sealed class AudioManager : MonoBehaviour
         PlayOneShotAt(hitLight, position);
     }
 
-    /// Play heavy hit sound at world position (3D)
     public void PlayHitHeavyAt(Vector3 position)
     {
         if (hitHeavy == null) return;
         PlayOneShotAt(hitHeavy, position);
     }
 
-    /// Play blood splat sound at world position (3D)
     public void PlayBloodSplatAt(Vector3 position)
     {
         if (bloodSplat == null) return;
         PlayOneShotAt(bloodSplat, position);
     }
 
-    /// Start charge loop sound following a transform (3D)
     public void StartChargeLoop(Transform followTransform)
     {
         if (chargeLoop == null || followTransform == null) return;
@@ -183,7 +173,6 @@ public sealed class AudioManager : MonoBehaviour
         chargeLoopSource.Play();
     }
 
-    /// Stop charge loop sound
     public void StopChargeLoop()
     {
         if (chargeLoopSource != null && chargeLoopSource.isPlaying)
@@ -201,7 +190,6 @@ public sealed class AudioManager : MonoBehaviour
         uiSource2D.PlayOneShot(comboTierUp);
     }
 
-    // Internal helper
     private void PlayOneShotAt(AudioClip clip, Vector3 position)
     {
         if (clip == null) return;
@@ -213,13 +201,12 @@ public sealed class AudioManager : MonoBehaviour
         source.clip = clip;
         source.Play();
 
-        // Return to pool when finished
         StartCoroutine(ReturnToPoolWhenFinished(source, clip.length));
     }
 
     private System.Collections.IEnumerator ReturnToPoolWhenFinished(AudioSource source, float duration)
     {
-        yield return new WaitForSeconds(duration + 0.1f); // Small buffer
+        yield return new WaitForSeconds(duration + 0.1f); // small buffer to avoid cutoff
         ReturnToPool(source);
     }
 }
