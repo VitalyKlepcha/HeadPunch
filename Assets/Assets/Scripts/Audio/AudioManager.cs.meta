@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 238f3323e3254e34f845266fdbbc94c1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - hitLight: {instanceID: 0}
+  - hitHeavy: {instanceID: 0}
+  - chargeLoop: {instanceID: 0}
+  - bloodSplat: {fileID: 8300000, guid: 5d0e38685dc80c24c8228872d8b8e7f0, type: 3}
+  - comboTierUp: {fileID: 8300000, guid: 77519c802b780ba4e91435dff0315908, type: 3}
+  - masterMixer: {fileID: 24100000, guid: 5267422c33b871d4c89bee0dcb5464fb, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
